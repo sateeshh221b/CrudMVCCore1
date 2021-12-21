@@ -1,19 +1,11 @@
 ﻿using Keepnote_Step1.Models;
 using Keepnote_Step1.Repository;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Keepnote_Step1.Controllers
 {
     public class NoteController : Controller
     {
-        /*Retrieve the NoteRepository object from the dependency Container through constructor Injection.*/
-        private readonly INoteRepository _noteRepository;
-        public NoteController(INoteRepository noteRepository)
-        {
-            _noteRepository = noteRepository;
-        }
-
         /*
           * From the problem statement, we can understand that the application
           * requires us to implement the following functionalities.
@@ -24,14 +16,25 @@ namespace Keepnote_Step1.Controllers
           * 3. Delete an existing note.
       */
 
+        /* 
+         * Retrieve the NoteRepository object from the dependency Container through constructor Injection.
+         */
+
+        private readonly INoteRepository repo;
+        public NoteController(INoteRepository _repo)
+        {
+            repo = _repo;
+        }
 
         /*Define a handler method to read the existing notes by calling the GetNotes() method 
-         * of the NoteRepository class and pass to view. it should map to the default URL i.e. "/" */
-        [HttpGet]
+        * of the NoteRepository class and pass to view. it should map to the default URL i.e. "/" */
+
         public IActionResult Index()
         {
-            return View(_noteRepository.GetNotes());
+            return View(repo.GetNotes());
         }
+
+
 
 
         /*Define a handler method which will read the Note data from request parameters and
@@ -40,26 +43,30 @@ namespace Keepnote_Step1.Controllers
          * from the user. Also, after saving the note, it should show the same along with existing 
          * notes.  
         */
-        [HttpPost]
+
         public IActionResult Create(Note note)
         {
             if (ModelState.IsValid)
             {
-                note.CreatedAt = DateTime.Now;
-                _noteRepository.AddNote(note);
+                repo.AddNote(note);
                 return RedirectToAction("Index");
             }
-            return View(note);
+            else
+            {
+                return View(note);
+            }
         }
 
         /* Define a handler method to delete an existing note by calling the DeleteNote() method 
          * of the NoteRepository class
         */
-        [HttpPost]
+
+        
         public IActionResult Delete(int id)
         {
-            _noteRepository.DeletNote(id);
+            repo.DeletNote(id);
             return RedirectToAction("Index");
         }
+
     }
 }

@@ -1,28 +1,31 @@
 ﻿using System.Collections.Generic;
 using Keepnote_Step1.Models;
+using System.Linq;
 
 namespace Keepnote_Step1.Repository
 {
-    /*
-    This class contains the code for data storage interactions and methods 
-    of this class will be used by other parts of the applications such
-    as Controllers and Test Cases
-    */
+      /*
+      This class contains the code for data storage interactions and methods 
+      of this class will be used by other parts of the applications such
+      as Controllers and Test Cases
+      */
     public class NoteRepository : INoteRepository
     {
+
         /* Declare a variable of List type to store all the notes. */
-        private readonly List<Note> _notes;
+        public List<Note> NoteList;
 
         public NoteRepository()
         {
             /* Initialize the variable using proper data type */
-            _notes = new List<Note>();
+            NoteList = new List<Note>();
+            
         }
 
         /* This method should return all the notes in the list */
         public List<Note> GetNotes()
         {
-            return _notes;
+            return NoteList;
         }
 
         /*
@@ -30,14 +33,21 @@ namespace Keepnote_Step1.Repository
 	    */
         public void AddNote(Note note)
         {
-            _notes.Add(note);
+            NoteList.Add(note);
         }
 
         /* This method should deleted a specified note from the list */
         public bool DeletNote(int noteId)
         {
-            var noteToRemove = _notes.Find(note => note.NoteId == noteId);
-            return _notes.Remove(noteToRemove);
+            bool notePresent = Exists(noteId);
+            if (notePresent)
+            {
+                Note note = NoteList.Where(x => x.NoteId == noteId).FirstOrDefault();
+                NoteList.Remove(note);
+                return true;
+            }
+            else
+                return false;
         }
 
         /*
@@ -47,8 +57,13 @@ namespace Keepnote_Step1.Repository
 	  */
         public bool Exists(int noteId)
         {
-            var noteFound = _notes.Find(note => note.NoteId == noteId);
-            return noteFound != null;
+            int index = NoteList.FindIndex(x => x.NoteId == noteId);
+
+            if (index==0)
+                return true;
+            else
+                return false;
+                                  
         }
     }
 }
